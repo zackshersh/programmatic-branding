@@ -1,5 +1,5 @@
 import { Rect } from "./Shapes";
-import { normalizeArray, spaceShapesOut } from "./utils";
+import { generatePointDistribution, normalizeArray, spaceShapesOut } from "./utils";
 
 class Grid {
     constructor(parent){
@@ -225,18 +225,21 @@ class GridSpace {
 
     populateChildren(){
 
+        let pointDistribution = generatePointDistribution(this.childCount);
+
         this.children = [];
         for(let i=0; i<this.childCount; i++){
             let rndmIndex = Math.floor(Math.random() * this.childTypes.length);
             let { childClass, args } = this.childTypes[rndmIndex];
 
             let child = new childClass(...args);
-            let x = Math.random();
-            let y = Math.random();
+            // let x = Math.random();
+            // let y = Math.random();
+            let pos = pointDistribution[i];
             
             child.setParent(this);
 
-            child.setLocalPos(x, y);
+            child.setLocalPos(pos.x, pos.y);
             child.setRotation(Math.random() * (Math.PI * 2))
             
             this.children.push(child);

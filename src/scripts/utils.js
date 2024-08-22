@@ -12,9 +12,62 @@ export function normalizeArray(arr){
 
 export function generatePointDistribution(numPoints){
     const points = [];
+
+    function distToClosestPoint(x, y){
+        let closestDist = 1;
+        if(points.length == 0){
+            return 1;
+        }
+
+        points.forEach(point => {
+            let d = Math.hypot((x-point.x),(y-point.y));
+
+            if(d < closestDist){
+                closestDist = d;
+            }
+        });
+
+        return closestDist;
+    }
+
     for(let i=0; i < numPoints; i++){
 
+        const maxAttempts = 10;
+        const closenessThreshold = 0.3;
+
+        let furthestSuggestedLocation;
+        let validLocation;
+
+        for(let attempt=0; attempt < maxAttempts; attempt++){
+            let x = Math.random();
+            x = Math.abs(Math.sin(x));
+            let y = Math.random();
+            
+            let d = distToClosestPoint(x, y);
+
+            if(d > closenessThreshold || points.length == 0){
+                validLocation = { x: x, y: y };
+                break;
+            } else {
+                if(!furthestSuggestedLocation || d > furthestSuggestedLocation.d){
+                    if(furthestSuggestedLocation) console.log(d)
+                    furthestSuggestedLocation = {
+                        x: x, y: y, d: d
+                    }
+                }
+            }
+
+        }
+
+        if(validLocation){
+            points.push(validLocation);
+        } else {
+            points.push(furthestSuggestedLocation);
+        }
+
     }
+    return points;
+    console.log(points)
 }
 export function spaceShapesOut(originalShapes, steps){
 
