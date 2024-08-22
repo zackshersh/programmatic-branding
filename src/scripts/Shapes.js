@@ -1,6 +1,6 @@
 
 class Shape {
-    constructor(){
+    constructor(fill){
         this.localPos = {
             x: 0,
             y: 0
@@ -8,12 +8,14 @@ class Shape {
 
         this.angle = 0;
 
+        this.fillColor = fill;
+
         // furthest possible distance of a point from the center, used for setting margins so that no point sticks outside of parent grid space
         this.longestLength = 0;
 
         this.parent = undefined;
 
-        // this.init();
+
     }
 
     init(){
@@ -24,19 +26,33 @@ class Shape {
         this.localPos = { x: x, y: y};
     }
 
+    setRotation(angle){
+        this.angle = angle;
+    }
+
     setParent(parent){
         this.parent = parent;
     }
 
-    // setCanvasRotation(){
+    setDrawRotation(x, y){
+        let ctx = this.getCtx();
+        ctx.translate(x, y);
+        ctx.rotate(this.angle);
+        ctx.translate(-x, -y);
+    }
 
-    // }
+    undoDrawRotation(x, y){
+        let ctx = this.getCtx();
+        ctx.translate(x, y);
+        ctx.rotate(this.angle * -1);
+        ctx.translate(-x, -y);
+    }
 
     getAbsolutePos(){
         let { w, h } = this.parent.actualSize;
 
         let margin = ( this.parent.margin * 2 ) + ( this.longestLength * 2 );
-        console.log(margin)
+
         let availableW = w - margin*2;
         let availableH = h - margin*2;
 
@@ -50,6 +66,10 @@ class Shape {
 
     }
 
+    getCtx(){
+        return this.parent.grid.graphicsManager.ctx;
+    }
+
     draw(){
         let { absX, absY } = this.getAbsolutePos();
         this.shapeSpecificDraw(absX, absY)
@@ -58,8 +78,8 @@ class Shape {
 
 
 export class Rect extends Shape {
-    constructor( w, h){
-        super()
+    constructor( w, h, fill){
+        super(fill)
         this.w = w;
         this.h = h;
 
@@ -73,9 +93,15 @@ export class Rect extends Shape {
     }
 
     shapeSpecificDraw(centerX, centerY){
-        let ctx = this.parent.grid.graphicsManager.ctx;
-        ctx.fillStyle = "black"
+        let ctx = this.getCtx();
+
+        ctx.fillStyle = this.fillColor;
+
+        this.setDrawRotation(centerX, centerY);
+
         ctx.fillRect(centerX - this.w/2, centerY - this.h/2, this.w, this.h);
+
+        this.undoDrawRotation(centerX, centerY)
     }
 
 }

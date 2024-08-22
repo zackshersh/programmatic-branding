@@ -1,5 +1,5 @@
 import { Rect } from "./Shapes";
-import { normalizeArray } from "./utils";
+import { normalizeArray, spaceShapesOut } from "./utils";
 
 class Grid {
     constructor(parent){
@@ -37,12 +37,12 @@ class Grid {
 
                     gridSpace.addChildType({
                         childClass: Rect,
-                        args: [18,10]
+                        args: [18, 10, "green"]
                     });
 
                     gridSpace.addChildType({
                         childClass: Rect,
-                        args: [22, 8]
+                        args: [22, 8, "blue"]
                     });
 
 
@@ -53,7 +53,7 @@ class Grid {
             this.spaces.push(col);
         }
 
-        console.log(this.spaces)
+
     }
 
     setRowColSizes(){
@@ -104,6 +104,50 @@ class Grid {
                 if(space.draw) space.draw();
             })
         })
+
+        this.drawGridLines()
+    }
+
+    drawGridLines(){
+
+        let ctx = this.graphicsManager.ctx;
+
+
+        let colXs = [];
+
+        for(let i=0; i < this.cols; i++){
+            let {x} = this.getColPosSize(i);
+            colXs.push(x);
+        }
+        
+        colXs.forEach(x => {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, this.h);
+            ctx.closePath();
+            
+            ctx.lineWidth = 1
+            ctx.stroke();
+        })
+
+
+        let rowYs = [];
+        for(let i=0; i < this.rows; i++){
+            let {y} = this.getRowPosSize(i);
+            rowYs.push(y);
+        }
+
+        rowYs.forEach(y => {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(this.w, y);
+            ctx.closePath();
+            
+            ctx.lineWidth = 1
+            ctx.stroke();
+        })
+
+
     }
 
 
@@ -166,10 +210,10 @@ class GridSpace {
             return Math.floor(Math.random() * max);
         }
 
-        this.grid.graphicsManager.ctx.fillStyle = `hsl(${rndm(360)}deg ${rndm(60)+30}% ${90}%)`
+        // this.grid.graphicsManager.ctx.fillStyle = `hsl(${rndm(360)}deg ${rndm(60)+30}% ${90}%)`
 
-        this.grid.graphicsManager.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-        this.grid.graphicsManager.ctx.strokeRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        // this.grid.graphicsManager.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        // this.grid.graphicsManager.ctx.strokeRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     }
 
     addChildType(type){
@@ -189,11 +233,17 @@ class GridSpace {
             let x = Math.random();
             let y = Math.random();
             
-            child.setLocalPos(x, y);
             child.setParent(this);
+
+            child.setLocalPos(x, y);
+            child.setRotation(Math.random() * (Math.PI * 2))
+            
             this.children.push(child);
         }
         console.log(this.children)
+        const steps = 4;
+        this.children = spaceShapesOut(this.children, steps);
+
     }
 
     
