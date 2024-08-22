@@ -6,6 +6,7 @@ class Shape {
             y: 0
         }
 
+        this.id = Math.floor(Math.random() * 999999);
         this.angle = 0;
 
         this.fillColor = fill;
