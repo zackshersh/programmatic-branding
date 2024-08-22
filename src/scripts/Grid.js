@@ -3,7 +3,7 @@ import { normalizeArray } from "./utils";
 
 class Grid {
     constructor(parent){
-        this.parent = parent;
+        this.graphicsManager = parent;
 
         this.w = 100;
         this.h = 100;
@@ -20,8 +20,8 @@ class Grid {
     }
 
     init(){
-        this.w = this.parent.width;
-        this.h = this.parent.height;
+        this.w = this.graphicsManager.width;
+        this.h = this.graphicsManager.height;
         
         this.setRowColSizes();
         this.populateGrid();
@@ -37,12 +37,12 @@ class Grid {
 
                     gridSpace.addChildType({
                         childClass: Rect,
-                        args: [12,7]
+                        args: [18,10]
                     });
 
                     gridSpace.addChildType({
                         childClass: Rect,
-                        args: [6, 8]
+                        args: [22, 8]
                     });
 
 
@@ -154,11 +154,7 @@ class GridSpace {
         this.outline();
 
         this.children.forEach(child => {
-            try {
-                child.draw();
-            } catch (err){
-                console.error(err);
-            }
+            child.draw();
         })
     }
 
@@ -169,10 +165,11 @@ class GridSpace {
         const rndm = (max) => {
             return Math.floor(Math.random() * max);
         }
-        this.grid.parent.ctx.fillStyle = `hsl(${rndm(360)}deg ${rndm(60)+30}% ${90}%)`
 
-        this.grid.parent.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-        this.grid.parent.ctx.strokeRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        this.grid.graphicsManager.ctx.fillStyle = `hsl(${rndm(360)}deg ${rndm(60)+30}% ${90}%)`
+
+        this.grid.graphicsManager.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+        this.grid.graphicsManager.ctx.strokeRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
     }
 
     addChildType(type){
